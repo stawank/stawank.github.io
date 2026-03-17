@@ -1,74 +1,660 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stawan Kulkarni | ADAS Software Developer</title>
+    <title>stawank.cv - System Offline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background: #f8f9fa; color: #333; }
-        header, footer { background: #343a40; color: #fff; padding: 20px 0; text-align: center; }
-        .container { width: 90%; max-width: 900px; margin: 0 auto; padding: 20px; }
-        h1{ color: #ffffff; }, h2 { color: #2c3e50; }
-        ul { padding-left: 20px; }
-        a { color: #007bff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        section { margin-bottom: 40px; }
+        /* ═══════════════════════════════════════════
+           TERMINAL OFFLINE PAGE
+           Matches stawank.cv design system
+           ═══════════════════════════════════════════ */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ── LIGHT ── */
+        :root {
+          --bg:           #f4f5f0;
+          --bg-raised:    #ffffff;
+          --bg-sunken:    #eaebe5;
+          --bg-chrome:    #ddddd5;
+          --text-hi:      #181810;
+          --text-md:      #383828;
+          --text-lo:      #808068;
+          --border:       #ccccbc;
+          --border-hi:    #9a9a88;
+          --green:        #2a6e2a;
+          --green-dim:    #3a8a3a;
+          --green-bg:     rgba(42,110,42,0.07);
+          --red:          #a82828;
+          --red-dim:      #883030;
+          --red-bg:       rgba(168,40,40,0.07);
+          --cursor:       #2a6e2a;
+          --prompt:       #2a6e2a;
+          --shadow-sm:    0 1px 4px rgba(0,0,0,0.08);
+          --shadow-md:    0 4px 24px rgba(0,0,0,0.11);
+          --t:            all 0.25s ease;
+          --scanline:     rgba(0,0,0,0.02);
+        }
+
+        /* ── DARK: classic green phosphor terminal ── */
+        [data-theme="dark"] {
+          --bg:           #090d09;
+          --bg-raised:    #0e140e;
+          --bg-sunken:    #060a06;
+          --bg-chrome:    #040804;
+          --text-hi:      #b8e890;
+          --text-md:      #78b855;
+          --text-lo:      #386825;
+          --border:       #183016;
+          --border-hi:    #2c5025;
+          --green:        #68d83e;
+          --green-dim:    #48a828;
+          --green-bg:     rgba(104,216,62,0.07);
+          --red:          #ff6b6b;
+          --red-dim:      #d84848;
+          --red-bg:       rgba(255,107,107,0.07);
+          --cursor:       #86f045;
+          --prompt:       #68d83e;
+          --shadow-sm:    0 1px 4px rgba(0,0,0,0.7);
+          --shadow-md:    0 4px 32px rgba(0,0,0,0.9);
+          --scanline:     rgba(0,0,0,0.2);
+        }
+
+        /* ── KEYFRAMES ── */
+        @keyframes blink   { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+        @keyframes flicker {
+          0%,100%{opacity:1}
+          92%{opacity:1} 93%{opacity:.97} 94%{opacity:1}
+          97%{opacity:.98} 98%{opacity:1}
+        }
+        @keyframes bootFadeIn {
+          from { opacity: 0; transform: translateX(-4px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: "JetBrains Mono", "Courier New", monospace;
+          background: var(--bg);
+          color: var(--text-hi);
+          font-size: 15px;
+          line-height: 1.75;
+          min-height: 100vh;
+          transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        [data-theme="dark"] body { animation: flicker 12s infinite; }
+
+        /* Phosphor glow — dark mode only */
+        [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] p,
+        [data-theme="dark"] a, [data-theme="dark"] span, [data-theme="dark"] .status-text {
+          text-shadow: 0 0 8px rgba(104,216,62,0.2);
+        }
+
+        /* Scanlines overlay */
+        body::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          background: repeating-linear-gradient(
+            0deg,
+            var(--scanline) 0px,
+            var(--scanline) 1px,
+            transparent 1px,
+            transparent 4px
+          );
+          pointer-events: none;
+          z-index: 1;
+          animation: flicker 8s infinite;
+        }
+
+        /* ════════════════════════════════
+           TERMINAL WINDOW
+           ════════════════════════════════ */
+        .container {
+          max-width: 760px;
+          margin: 2rem auto;
+          padding: 0;
+          border: 1px solid var(--border-hi);
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: var(--shadow-md), 0 0 0 1px var(--border), 0 0 60px rgba(168,192,96,0.05);
+          position: relative;
+          z-index: 1;
+        }
+
+        [data-theme="dark"] .container {
+          box-shadow: var(--shadow-md), 0 0 0 1px var(--border), 0 0 60px rgba(106,216,64,0.06);
+        }
+
+        /* Terminal title bar */
+        .terminal-header {
+          background: var(--bg-chrome);
+          color: var(--text-lo);
+          font-size: 0.72rem;
+          letter-spacing: 0.08em;
+          padding: 0.55rem 1rem;
+          border-bottom: 1px solid var(--border);
+          text-align: center;
+        }
+
+        .terminal-body {
+          padding: 2.25rem 2.5rem;
+          background: var(--bg-raised);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+          position: fixed;
+          top: 1.25rem;
+          right: 1.25rem;
+          background: var(--bg-raised);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10000;
+          opacity: 0.75;
+          transition: opacity 0.2s, border-color 0.2s;
+          box-shadow: var(--shadow-sm);
+        }
+        .theme-toggle:hover { opacity: 1; border-color: var(--green); }
+        .theme-toggle .icon { font-size: 14px; }
+
+        /* ════════════════════════════════
+           STATUS SECTION
+           ════════════════════════════════ */
+        .status-indicator {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.35rem 0.85rem;
+          background: var(--red-bg);
+          border: 1px solid var(--red-dim);
+          border-radius: 2px;
+          margin-bottom: 1.5rem;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--red);
+        }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          background: var(--red);
+          border-radius: 50%;
+          animation: blink 1.5s step-end infinite;
+        }
+
+        /* ════════════════════════════════
+           MAIN CONTENT
+           ════════════════════════════════ */
+        .main-title {
+          font-size: 1.1rem;
+          font-weight: 500;
+          color: var(--text-hi);
+          letter-spacing: 0.03em;
+          margin-bottom: 0.75rem;
+          line-height: 1.4;
+        }
+
+        .main-title::after {
+          content: "█";
+          color: var(--cursor);
+          font-size: 0.95rem;
+          margin-left: 3px;
+          vertical-align: middle;
+          animation: blink 1s step-end infinite;
+        }
+
+        .subtitle {
+          font-size: 0.78rem;
+          font-weight: 400;
+          color: var(--text-md);
+          letter-spacing: 0.05em;
+          margin-bottom: 2rem;
+          line-height: 1.7;
+        }
+
+        .subtitle::before { 
+          content: "// "; 
+          opacity: 0.5; 
+        }
+
+        /* ════════════════════════════════
+           BOOT LOG STYLE INFO
+           ════════════════════════════════ */
+        .boot-lines {
+          display: flex;
+          flex-direction: column;
+          gap: 0.3rem;
+          margin-bottom: 2rem;
+          padding: 1rem;
+          background: var(--bg-sunken);
+          border: 1px solid var(--border);
+          border-radius: 2px;
+        }
+
+        .boot-line {
+          font-size: 0.78rem;
+          line-height: 1.6;
+          display: flex;
+          align-items: baseline;
+          gap: 0.5rem;
+        }
+
+        .boot-line::before {
+          content: ">";
+          color: var(--prompt);
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+
+        .boot-line--ok { color: var(--text-lo); }
+        .boot-line--fail { color: var(--red); font-weight: 500; }
+        .boot-line--info { color: var(--text-md); }
+
+        .boot-timestamp {
+          color: var(--text-lo);
+          font-size: 0.68rem;
+          opacity: 0.6;
+          letter-spacing: 0.04em;
+          flex-shrink: 0;
+        }
+
+        .boot-status {
+          color: var(--green);
+          margin-left: auto;
+          font-size: 0.7rem;
+        }
+
+        .boot-status--fail {
+          color: var(--red);
+        }
+
+        /* ════════════════════════════════
+           INFO SECTIONS
+           ════════════════════════════════ */
+        .section {
+          margin-bottom: 2rem;
+        }
+
+        .section-title {
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          color: var(--green);
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.35rem 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .section-title::before {
+          content: "[";
+          color: var(--text-lo);
+          font-weight: 400;
+          font-size: 0.82rem;
+        }
+        .section-title::after {
+          content: "]";
+          color: var(--text-lo);
+          font-weight: 400;
+          font-size: 0.82rem;
+        }
+
+        /* Info lines */
+        .info-lines {
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
+        }
+
+        .info-line {
+          display: flex;
+          align-items: baseline;
+          gap: 0;
+          font-size: 0.85rem;
+          line-height: 1.6;
+        }
+
+        .info-line::before {
+          content: ">";
+          color: var(--prompt);
+          font-weight: 600;
+          margin-right: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        .info-key {
+          color: var(--text-lo);
+          min-width: 10rem;
+          flex-shrink: 0;
+          letter-spacing: 0.04em;
+        }
+
+        .info-key::after {
+          content: ":";
+          margin-right: 0.75rem;
+          opacity: 0.5;
+        }
+
+        .info-val {
+          color: var(--text-md);
+          line-height: 1.6;
+        }
+
+        .info-val a {
+          color: var(--green);
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
+        }
+
+        .info-val a:hover {
+          border-bottom-color: var(--green);
+        }
+
+        /* Contact links */
+        .contact-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+
+        .contact-link {
+          font-size: 0.75rem;
+          color: var(--text-md);
+          text-decoration: none;
+          padding: 0.25rem 0.65rem;
+          border: 1px solid var(--border-hi);
+          border-radius: 2px;
+          background: var(--bg-sunken);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          transition: var(--t);
+          letter-spacing: 0.03em;
+        }
+        .contact-link:hover {
+          border-color: var(--green);
+          color: var(--green);
+          background: var(--green-bg);
+        }
+
+        /* ════════════════════════════════
+           FOOTER
+           ════════════════════════════════ */
+        .footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.6rem 0 0.25rem 0;
+          font-size: 0.68rem;
+          color: var(--text-lo);
+          letter-spacing: 0.08em;
+          opacity: 0.5;
+          margin-top: 2rem;
+          border-top: 1px solid var(--border);
+        }
+
+        .footer-exit { 
+          color: var(--text-lo); 
+          opacity: 0.7; 
+        }
+
+        /* ════════════════════════════════
+           MOBILE
+           ════════════════════════════════ */
+        @media (max-width: 700px) {
+          .container { 
+            margin: 0; 
+            border-radius: 0; 
+            border-left: none; 
+            border-right: none; 
+          }
+          .terminal-body { 
+            padding: 1.5rem; 
+          }
+          .info-key {
+            min-width: 7rem;
+          }
+          .boot-lines {
+            padding: 0.75rem;
+          }
+          .boot-timestamp {
+            display: none;
+          }
+        }
+
+        /* ════════════════════════════════
+           SCROLLBAR + SELECTION
+           ════════════════════════════════ */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-hi); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--green); }
+        ::selection { background: var(--green); color: var(--bg); text-shadow: none; }
     </style>
 </head>
 <body>
+    <!-- Theme toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <span class="icon">◐</span>
+    </button>
 
-<header>
-    <h1>Stawan Chandrashekhar Kulkarni</h1>
-    <p>ADAS Software Developer | C++ | MATLAB/Simulink | MiL/SiL</p>
-</header>
+    <div class="container">
+        <!-- Terminal header bar -->
+        <div class="terminal-header">
+            ● ● ●   stawan@portfolio: ~/offline
+        </div>
 
-<div class="container">
-    <section id="about">
-        <h2>About Me</h2>
-        <p>I am an Automotive software engineer with over 2.5 years of experience in the automotive domain, focused on Advanced Driver Assistance Systems (ADAS). I studied M.Sc. Commercial Vehicle Technology from Rheinland Pfälsische Technische Universität (RPTU) Kaiserslautern Landau, Kaiserslautern, Germany. I have worked on projects containing C++ development, model-based development with MATLAB/Simulink, and system-level testing in SiL/MiL/HiL environments. </p>
-    </section>
+        <!-- Terminal body -->
+        <div class="terminal-body">
+            <!-- Status indicator -->
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>System Offline</span>
+            </div>
 
-    <section id="experience">
-        <h2>Experience</h2>
-        <ul>
-            <li><strong>EDAG Engineering GmbH – System Engineer (ADAS)</strong>
-                <br>Testing and validation of assisted parking features using SiL/MiL setups, TPT, and Simulink.</li>
-            <li><strong>Continental ADC GmbH – Software Developer (Working Student)</strong><br>Developed embedded software components in C++ and implemented a SOA architecture prototype for ADAS.</li>
-        </ul>
-    </section>
-
-    <section id="skills">
-        <h2>Skills</h2>
-        <ul>
-            <li><strong>Languages:</strong> C++, Python, MATLAB</li>
-            <li><strong>Tools:</strong> CANoe, TPT, Lauterbach, Git, MKS, ODIS, DOORS</li>
-            <li><strong>Simulation:</strong> Simulink</li>
-            <li><strong>Standards:</strong> ISO 26262, AUTOSAR</li>
-        </ul>
-    </section>
-
-    <section id="projects">
-        <h2>Projects</h2>
-        <ul>
-            <li> To be added soon.</li>
+            <!-- Main title -->
+            <h1 class="main-title">Server Powered Down</h1>
             
-        </ul>
-    </section>
+            <p class="subtitle">
+                Self-hosted Raspberry Pi server is currently offline
+            </p>
 
+            <!-- Boot log style status -->
+            <div class="boot-lines">
+                <div class="boot-line boot-line--ok">
+                    <span class="boot-timestamp" id="timestamp-1">[--:--:--]</span>
+                    <span>System shutdown requested</span>
+                    <span class="boot-status">OK</span>
+                </div>
+                <div class="boot-line boot-line--ok">
+                    <span class="boot-timestamp" id="timestamp-2">[--:--:--]</span>
+                    <span>Services stopped gracefully</span>
+                    <span class="boot-status">OK</span>
+                </div>
+                <div class="boot-line boot-line--fail">
+                    <span class="boot-timestamp" id="timestamp-3">[--:--:--]</span>
+                    <span>Power state: OFF</span>
+                    <span class="boot-status boot-status--fail">OFFLINE</span>
+                </div>
+                <div class="boot-line boot-line--info">
+                    <span class="boot-timestamp" id="timestamp-4">[--:--:--]</span>
+                    <span>Auto-restart on power restore enabled</span>
+                    <span class="boot-status">READY</span>
+                </div>
+            </div>
 
+            <!-- System info section -->
+            <div class="section">
+                <h2 class="section-title">System Status</h2>
+                <div class="info-lines">
+                    <div class="info-line">
+                        <span class="info-key">Last Online</span>
+                        <span class="info-val" id="last-online">Calculating...</span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-key">Server Type</span>
+                        <span class="info-val">Raspberry Pi 4 (Self-hosted)</span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-key">Expected Uptime</span>
+                        <span class="info-val">Auto-restart when powered on</span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-key">Recovery Mode</span>
+                        <span class="info-val">Automatic on boot</span>
+                    </div>
+                </div>
+            </div>
 
-    <section id="contact">
-        <h2>Contact</h2>
-        <p>Email: stawank@gmail.com</p>
-        <p>GitHub: <a href="https://github.com/stawank" target="_blank">github.com/stawank</a></p>
-        <p>LinkedIn: <a href="https://www.linkedin.com/in/stawan-chandrashekhar-kulkarni-810646102/" target="_blank">https://www.linkedin.com/in/stawan-chandrashekhar-kulkarni-810646102/</a></p>
-    </section>
-</div>
+            <!-- Contact section -->
+            <div class="section">
+                <h2 class="section-title">Contact Information</h2>
+                <div class="info-lines">
+                    <div class="info-line">
+                        <span class="info-key">Email</span>
+                        <span class="info-val">
+                            <a href="mailto:your.email@example.com">your.email@example.com</a>
+                        </span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-key">LinkedIn</span>
+                        <span class="info-val">
+                            <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a>
+                        </span>
+                    </div>
+                    <div class="info-line">
+                        <span class="info-key">GitHub</span>
+                        <span class="info-val">
+                            <a href="https://github.com/yourusername" target="_blank">github.com/in/yourusername</a>
+                        </span>
+                    </div>
+                </div>
 
-<footer>
-    <p>© 2025 Stawan Chandrashekhar Kulkarni</p>
-</footer>
+                <!-- Alternative: Quick contact buttons -->
+                <div class="contact-links">
+                    <a href="mailto:your.email@example.com" class="contact-link">
+                        <span>✉</span> Email
+                    </a>
+                    <a href="https://linkedin.com/in/yourprofile" target="_blank" class="contact-link">
+                        <span>in</span> LinkedIn
+                    </a>
+                    <a href="https://github.com/yourusername" target="_blank" class="contact-link">
+                        <span>⌘</span> GitHub
+                    </a>
+                </div>
+            </div>
 
+            <!-- Footer -->
+            <div class="footer">
+                <span>stawank.cv</span>
+                <span class="footer-exit">exit [0]</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════
+        // THEME TOGGLE
+        // ═══════════════════════════════════════════
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        // Load saved theme or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // ═══════════════════════════════════════════
+        // TIMESTAMP HANDLING
+        // ═══════════════════════════════════════════
+        function updateTimestamps() {
+            // Get or set last online time
+            let lastOnlineTimestamp = localStorage.getItem('lastOnlineTime');
+            if (!lastOnlineTimestamp) {
+                // If not set, use current time as fallback
+                lastOnlineTimestamp = new Date().toISOString();
+                localStorage.setItem('lastOnlineTime', lastOnlineTimestamp);
+            }
+
+            const lastOnlineDate = new Date(lastOnlineTimestamp);
+            
+            // Update boot log timestamps
+            const now = new Date();
+            const hour = String(lastOnlineDate.getHours()).padStart(2, '0');
+            const min = String(lastOnlineDate.getMinutes()).padStart(2, '0');
+            const sec = String(lastOnlineDate.getSeconds()).padStart(2, '0');
+            const timeStr = `${hour}:${min}:${sec}`;
+            
+            document.querySelectorAll('.boot-timestamp').forEach(el => {
+                el.textContent = `[${timeStr}]`;
+            });
+
+            // Update "Last Online" relative time
+            const diffMs = now - lastOnlineDate;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            let displayText;
+            
+            if (diffMins < 1) {
+                displayText = 'Just now';
+            } else if (diffMins < 60) {
+                displayText = `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+            } else if (diffHours < 24) {
+                displayText = `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+            } else if (diffDays < 7) {
+                displayText = `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+            } else {
+                displayText = lastOnlineDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            const lastOnlineEl = document.getElementById('last-online');
+            if (lastOnlineEl) {
+                lastOnlineEl.textContent = displayText;
+            }
+        }
+
+        // Update timestamps on load and every minute
+        updateTimestamps();
+        setInterval(updateTimestamps, 60000);
+
+        // ═══════════════════════════════════════════
+        // OPTIONAL: For testing - uncomment to set current time
+        // ═══════════════════════════════════════════
+        // localStorage.setItem('lastOnlineTime', new Date().toISOString());
+    </script>
 </body>
 </html>
